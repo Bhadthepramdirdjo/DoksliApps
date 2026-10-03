@@ -2,15 +2,18 @@
 import { ref, computed } from 'vue'
 import SearchBar from '../components/ui/SearchBar.vue'
 import DocumentTable from '../components/ui/DocumentTable.vue'
+import DocumentDrawer from '../components/ui/DocumentDrawer.vue'
 import Checkbox from '../components/ui/Checkbox.vue'
 import Icon from '../components/Icon.vue'
+import type { Doc } from '../data/sampleData'
 import { documents, folders } from '../data/sampleData'
-import { pushToast } from '../composables/useToast'
 
 const q = ref('')
 const category = ref('')
 const folder = ref('')
 const includeTrash = ref(false)
+const drawerDoc = ref<Doc | null>(null)
+const drawerOpen = ref(false)
 
 const categories = ['Kontrak','Keuangan','SDM','Legal','Korespondensi'] as const
 
@@ -26,9 +29,14 @@ const results = computed(() => {
   return r
 })
 
-function onDownload(id:string){ pushToast('Unduh ' + documents.find(d=>d.id===id)?.name) }
-function onTrash(id:string){ pushToast('Sampah ' + documents.find(d=>d.id===id)?.name) }
-function onOpen(id:string){ pushToast('Detail ' + documents.find(d=>d.id===id)?.name) }
+function onDownload(_id:string){ /* no-op: download belum diimplementasi */ }
+function onTrash(_id:string){ /* no-op: hapus belum diimplementasi */ }
+function onOpen(id:string){
+  const d = documents.find(d=>d.id===id) ?? null
+  drawerDoc.value = d
+  drawerOpen.value = true
+}
+function closeDrawer(){ drawerOpen.value = false }
 </script>
 
 <template>
@@ -45,7 +53,7 @@ function onOpen(id:string){ pushToast('Detail ' + documents.find(d=>d.id===id)?.
             <option value="">Semua folder</option>
             <option v-for="f in folders" :key="f.id" :value="f.id">{{ f.name }}</option>
           </select>
-          <Checkbox v-model="includeTrash" label="Sertakan tempat sampah" />
+          <Checkbox v-model="includeTrash" label="Sertakan tempat sampah" icon="trash" />
         </div>
       </div>
     </div>
@@ -70,4 +78,6 @@ function onOpen(id:string){ pushToast('Detail ' + documents.find(d=>d.id===id)?.
       </div>
     </div>
   </div>
+
+  <DocumentDrawer :doc="drawerDoc" :open="drawerOpen" @close="closeDrawer" />
 </template>

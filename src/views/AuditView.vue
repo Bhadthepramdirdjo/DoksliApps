@@ -3,7 +3,6 @@ import { ref, computed } from 'vue'
 import Icon from '../components/Icon.vue'
 import Button from '../components/ui/Button.vue'
 import { auditLog } from '../data/sampleData'
-import { pushToast } from '../composables/useToast'
 
 const user = ref('')
 const action = ref('')
@@ -32,7 +31,7 @@ const rows = computed(() => {
             <option value="">Semua aksi</option>
             <option v-for="a in actions" :key="a">{{ a }}</option>
           </select>
-          <Button variant="ghost" class="ml-auto" @click="pushToast('Log audit diekspor ke CSV (simulasi)')">
+          <Button variant="ghost" class="ml-auto" @click="() => {}">
             <Icon name="download" :size="14" /> Ekspor CSV
           </Button>
         </div>

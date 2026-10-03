@@ -19,3 +19,9 @@ withDefaults(defineProps<{
     <slot />
   </button>
 </template>
+
+<style scoped>
+/* scoped override untuk danger — agar tetap konsisten walau style global */
+.btn.danger{ background:var(--danger-soft); border-color:var(--danger-soft); color:var(--danger); }
+.btn.danger:hover{ filter:brightness(1.05); }
+</style>

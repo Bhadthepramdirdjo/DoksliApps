@@ -3,12 +3,15 @@ import { ref, computed } from 'vue'
 import Icon from '../components/Icon.vue'
 import Button from '../components/ui/Button.vue'
 import DocumentTable from '../components/ui/DocumentTable.vue'
+import DocumentDrawer from '../components/ui/DocumentDrawer.vue'
 import FolderList from '../components/ui/FolderList.vue'
+import type { Doc } from '../data/sampleData'
 import { folders, documents } from '../data/sampleData'
-import { pushToast } from '../composables/useToast'
 
 const tab = ref<'active' | 'trash'>('active')
 const currentFolder = ref<string | null>(null)
+const drawerDoc = ref<Doc | null>(null)
+const drawerOpen = ref(false)
 
 const activeFolder = computed(() => folders.find(f => f.id === currentFolder.value) ?? null)
 const activeDocs = computed(() => {
@@ -20,22 +23,21 @@ const activeDocs = computed(() => {
 function selectFolder(id: string){ currentFolder.value = id }
 function clearFolder(){ currentFolder.value = null }
 
-function onDownload(id: string){
-  const d = documents.find(x => x.id === id)
-  pushToast(`Mengunduh "${d?.name}" (simulasi)`)
+function onDownload(_id: string){
+  // no-op: download belum diimplementasi
 }
-function onTrash(id: string){
-  const d = documents.find(x => x.id === id)
-  pushToast(`"${d?.name}" dipindahkan ke sampah`)
+function onTrash(_id: string){
+  // no-op: hapus belum diimplementasi
 }
-function onRestore(id: string){
-  const d = documents.find(x => x.id === id)
-  pushToast(`"${d?.name}" dipulihkan`)
+function onRestore(_id: string){
+  // no-op: pulihkan belum diimplementasi
 }
 function onOpen(id: string){
-  const d = documents.find(x => x.id === id)
-  pushToast(`Buka detail "${d?.name}"`)
+  const d = documents.find(x => x.id === id) ?? null
+  drawerDoc.value = d
+  drawerOpen.value = true
 }
+function closeDrawer(){ drawerOpen.value = false }
 </script>
 
 <template>
@@ -48,7 +50,7 @@ function onOpen(id: string){
           <button class="current">{{ activeFolder.name }}</button>
         </template>
       </div>
-      <Button v-if="tab === 'active'" variant="primary" size="sm" @click="pushToast('Unggah dokumen — template sampleData')">
+      <Button v-if="tab === 'active'" variant="primary" size="sm" @click="() => {}">
         <Icon name="plus" :size="14" /> Unggah Dokumen
       </Button>
     </div>
@@ -59,7 +61,6 @@ function onOpen(id: string){
         <button class="tab" :class="{ active: tab === 'trash' }" @click="tab = 'trash'">Tempat Sampah</button>
       </div>
 
-      <!-- trash view -->
       <template v-if="tab === 'trash'">
         <DocumentTable
           v-if="activeDocs.length"
@@ -74,11 +75,10 @@ function onOpen(id: string){
         </div>
       </template>
 
-      <!-- active: folder grid or doc table -->
       <template v-else>
         <template v-if="!activeFolder">
           <FolderList :folders="folders" @select="selectFolder" />
-          <p class="muted text-xs mt-3">Klik folder untuk lihat dokumen. Data sampleData 14 dokumen sesuai prototype.</p>
+          <p class="muted text-xs mt-3">Klik folder untuk lihat dokumen.</p>
         </template>
         <template v-else>
           <button class="btn ghost sm mb-3" @click="clearFolder()">
@@ -99,4 +99,6 @@ function onOpen(id: string){
       </template>
     </div>
   </div>
+
+  <DocumentDrawer :doc="drawerDoc" :open="drawerOpen" @close="closeDrawer" />
 </template>
